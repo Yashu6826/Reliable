@@ -26,11 +26,15 @@ export async function apiRequest(
 type UnauthorizedBehavior = "returnNull" | "throw";
 
 // Replace QueryFunction<T> with an inline generic type
+import type { QueryFunctionContext } from "@tanstack/react-query";
+
 export const getQueryFn = <T>(options: {
   on401: UnauthorizedBehavior;
 }) => {
-  return async ({ queryKey }: { queryKey: readonly string[] }): Promise<T | null> => {
-    const res = await fetch(queryKey.join("/") as string, {
+  return async ({ queryKey }: QueryFunctionContext): Promise<T | null> => {
+    // Convert all queryKey elements to string and join with "/"
+    const url = queryKey.map(String).join("/");
+    const res = await fetch(url, {
       credentials: "include",
     });
 
